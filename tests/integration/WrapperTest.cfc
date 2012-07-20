@@ -17,7 +17,17 @@
 <!--- tests --->
 	<cffunction name="t01_ping_shouldReturnServerInformation" returntype="void">
 		<cfscript>
-			fail("t01_ping_shouldReturnServerInformation not yet implemented");
+			var result = "";
+
+			wrapper.init( "http://localhost:9200" );
+
+			result = wrapper.ping();
+
+			super.assert( result.ok );
+			super.assertEquals( 200, result.status );
+			super.assert( StructKeyExists( result, "version" ) );
+			super.assert( StructKeyExists( result, "tagline" ) );
+			super.assert( StructKeyExists( result, "name"    ) );
 		</cfscript>
 	</cffunction>
 
