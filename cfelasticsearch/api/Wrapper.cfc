@@ -14,6 +14,18 @@
 		<cfreturn _call( uri="/", method="GET" ) />
 	</cffunction>
 
+	<cffunction name="createIndex" access="public" returntype="struct" output="false">
+		<cfargument name="indexName" type="string" required="true" />
+
+		<cfreturn _call( uri="/#Trim(indexName)#", method="PUT" ) />
+	</cffunction>
+
+	<cffunction name="deleteIndex" access="public" returntype="struct" output="false">
+		<cfargument name="indexName" type="string" required="true" />
+
+		<cfreturn _call( uri="/#Trim(indexName)#", method="DELETE" ) />
+	</cffunction>
+
 <!--- private utility --->
 	<cffunction name="_call" access="private" returntype="any" output="false">
 		<cfargument name="uri" type="string" required="true" />
