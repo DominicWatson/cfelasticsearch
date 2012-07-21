@@ -69,6 +69,23 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="t05_deleteIndex_shouldThrowError_whenIndexDoesNotExist" returntype="void">
+		<cfscript>
+			var indexName = "iDoNOTExist";
+			var failed    = false;
+
+			try {
+				wrapper.deleteIndex( indexName );
+			} catch ( "cfelasticsearch.IndexMissingException" e ) {
+				failed = true;
+				super.assertEquals( "[#indexName#] missing", e.message );
+				super.assertEquals( 404, e.errorCode );
+			}
+
+			super.assert( failed, "The API did not throw an error when attempting to delete an index that did not exist." );
+		</cfscript>
+	</cffunction>
+
 <!--- private --->
 	<cffunction name="_teardownTestIndexes" access="private" returntype="void" output="false">
 		<cftry>
