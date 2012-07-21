@@ -51,6 +51,24 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="t04_createIndex_shouldThrowError_whenIndexAlreadyExists" returntype="void">
+		<cfscript>
+			var indexName = "sometestindex";
+			var result    = wrapper.createIndex( indexName );
+			var failed    = false;
+
+			try {
+				result = wrapper.createIndex( indexName );
+			} catch ( "cfelasticsearch.IndexAlreadyExistsException" e ) {
+				failed = true;
+				super.assertEquals( "[#indexName#] Already exists", e.message );
+				super.assertEquals( 400, e.errorCode );
+			}
+
+			super.assert( failed, "The API did not throw an error when attempting to create an index that already exists." );
+		</cfscript>
+	</cffunction>
+
 <!--- private --->
 	<cffunction name="_teardownTestIndexes" access="private" returntype="void" output="false">
 		<cftry>
