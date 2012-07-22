@@ -92,7 +92,7 @@
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="t06_add_shouldAddASingleDocumentToSpecifiedIndex_whenAStructIsPassed" returntype="void">
+	<cffunction name="t06_addDoc_shouldAddASingleDocument" returntype="void">
 		<cfscript>
 			var indexName = "addDocTest";
 			var result    = wrapper.createIndex( indexName );
@@ -115,6 +115,41 @@
 			super.assertEquals( indexName , result['_index']   );
 			super.assertEquals( 'someType', result['_type']    );
 			super.assertEquals( 1         , result['_version'] );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t07_addDoc_shouldUpdateExistingDoc" returntype="void">
+		<cfscript>
+			var indexName = "addDocTest";
+			var result    = wrapper.createIndex( indexName );
+			var doc      = {
+				  id = 3499
+				, title = "This is a title"
+				, category = "Category"
+				, dateCreated = "2012-07-22"
+			};
+
+			wrapper.addDoc(
+				  index = indexName
+				, type  = "someType"
+				, id    = doc.id
+				, doc   = doc
+			);
+
+			doc.title = "Changed";
+
+			result = wrapper.addDoc(
+				  index = indexName
+				, type  = "someType"
+				, id    = doc.id
+				, doc   = doc
+			);
+
+			super.assert( result.ok );
+			super.assertEquals( doc.id    , result['_id']      );
+			super.assertEquals( indexName , result['_index']   );
+			super.assertEquals( 'someType', result['_type']    );
+			super.assertEquals( 2         , result['_version'] );
 		</cfscript>
 	</cffunction>
 
