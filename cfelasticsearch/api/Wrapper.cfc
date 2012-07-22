@@ -17,13 +17,13 @@
 	<cffunction name="createIndex" access="public" returntype="struct" output="false">
 		<cfargument name="indexName" type="string" required="true" />
 
-		<cfreturn _call( uri="/#Trim(indexName)#", method="PUT" ) />
+		<cfreturn _call( uri="/#_safeIndexName( indexName )#", method="PUT" ) />
 	</cffunction>
 
 	<cffunction name="deleteIndex" access="public" returntype="struct" output="false">
 		<cfargument name="indexName" type="string" required="true" />
 
-		<cfreturn _call( uri="/#Trim(indexName)#", method="DELETE" ) />
+		<cfreturn _call( uri="/#_safeIndexName( indexName )#", method="DELETE" ) />
 	</cffunction>
 
 <!--- private utility --->
@@ -88,6 +88,12 @@
 			);
 
 		</cfscript>
+	</cffunction>
+
+	<cffunction name="_safeIndexName" access="private" returntype="string" output="false">
+		<cfargument name="indexName" type="string" required="true" />
+
+		<cfreturn Trim( LCase( indexName ) ) />
 	</cffunction>
 
 <!--- accessors --->

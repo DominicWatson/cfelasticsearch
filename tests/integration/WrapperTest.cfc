@@ -37,7 +37,7 @@
 
 	<cffunction name="t02_createIndex_shouldCreateANewIndex" returntype="void">
 		<cfscript>
-			var indexName = "sometestindex";
+			var indexName = "someTestIndex";
 			var result    = wrapper.createIndex( indexName );
 
 			super.assert( result.ok );
