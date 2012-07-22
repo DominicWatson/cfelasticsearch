@@ -26,14 +26,36 @@
 		<cfreturn _call( uri="/#_safeIndexName( indexName )#", method="DELETE" ) />
 	</cffunction>
 
+	<cffunction name="addDoc" access="public" returntype="struct" output="false">
+		<cfargument name="index" type="string" required="true" />
+		<cfargument name="type"  type="string" required="true" />
+		<cfargument name="id"    type="string" required="true" />
+		<cfargument name="doc"   type="struct" required="true" />
+
+		<cfscript>
+			var uri = "/#_safeIndexName( index )#/#Trim( type )#/#id#";
+
+			return _call(
+				  uri    = uri
+				, method = "PUT"
+				, body   = SerializeJson( doc )
+			);
+		</cfscript>
+	</cffunction>
+
 <!--- private utility --->
 	<cffunction name="_call" access="private" returntype="any" output="false">
 		<cfargument name="uri" type="string" required="true" />
 		<cfargument name="method" type="string" required="true" />
+		<cfargument name="body" type="string" required="false" />
 
 		<cfset var result = "" />
 
-		<cfhttp url="#_getEndpoint()##uri#" method="#arguments.method#" result="result"></cfhttp>
+		<cfhttp url="#_getEndpoint()##uri#" method="#arguments.method#" result="result">
+			<cfif StructKeyExists( arguments, 'body' )>
+				<cfhttpparam type="body" value="#body#" />
+			</cfif>
+		</cfhttp>
 
 		<cfreturn _processResult( result ) />
 	</cffunction>
@@ -55,7 +77,7 @@
 				);
 			}
 
-			if ( result.status_code EQ "200" ) {
+			if ( left( result.status_code, 1 ) EQ "2" ) {
 				return deserialized;
 			}
 
