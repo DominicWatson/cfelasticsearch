@@ -92,6 +92,30 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="t06_add_shouldAddASingleDocumentToSpecifiedIndex_whenAStructIsPassed" returntype="void">
+		<cfscript>
+			var indexName = "addDocTest";
+			var result    = wrapper.createIndex( indexName );
+			var doc      = {
+				  id = 3499
+				, title = "This is a title"
+				, category = "Category"
+				, dateCreated = "2012-07-22"
+			};
+
+			result = wrapper.addDoc(
+				  index = indexName
+				, type  = "someType"
+				, id    = doc.id
+				, doc   = doc
+			);
+
+
+			super.assert( result.ok );
+			super.assert( result.acknowledged );
+		</cfscript>
+	</cffunction>
+
 <!--- private --->
 	<cffunction name="_teardownTestIndexes" access="private" returntype="void" output="false">
 		<cftry>
