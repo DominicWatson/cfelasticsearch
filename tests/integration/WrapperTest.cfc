@@ -110,9 +110,11 @@
 				, doc   = doc
 			);
 
-
 			super.assert( result.ok );
-			super.assert( result.acknowledged );
+			super.assertEquals( doc.id    , result['_id']      );
+			super.assertEquals( indexName , result['_index']   );
+			super.assertEquals( 'someType', result['_type']    );
+			super.assertEquals( 1         , result['_version'] );
 		</cfscript>
 	</cffunction>
 
