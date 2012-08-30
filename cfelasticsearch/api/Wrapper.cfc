@@ -62,7 +62,11 @@
 					);
 				}
 
-				body.append( '{ "index" : { "_id" : "#docs[i][idField]#" } }' & chr(10) );
+				if ( StructKeyExists( docs[i], idField ) ) {
+					body.append( '{ "index" : { "_id" : "#docs[i][idField]#" } }' & chr(10) );
+				} else {
+					body.append( '{ "index" : {} }' & chr(10) );
+				}
 				body.append( SerializeJson( docs[i] ) & chr(10) );
 			}
 

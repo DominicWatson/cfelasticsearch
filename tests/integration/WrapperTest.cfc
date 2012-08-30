@@ -242,6 +242,30 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="t10_addDocs_shouldHaveElasticSearchCreateIds_whenDocsDoNotHaveIdField" returntype="void">
+		<cfscript>
+			var indexName = "addDocsTestNoId";
+			var type      = "someType";
+			var result    = wrapper.createIndex( indexName );
+			var i         = 0;
+			var docs      = [{
+				  idfield = "someIdHere"
+				, title = "Title 1"
+				, category = "Category 1"
+			},{
+				  title = "Title 3"
+				, category = "Category 3"
+			}];
+
+			result = wrapper.addDocs( indexName, type, docs, 'idfield' );
+			super.assert( StructKeyExists( result, 'items' ) and IsArray( result.items ), "Return format is not as expected" );
+			super.assertEquals( ArrayLen( docs ), ArrayLen( result.items ), "Result did not confirm that all docs were added" );
+
+			super.assertEquals( docs[1].idfield, result.items[1].index._id );
+			super.assert( Len( Trim( result.items[2].create._id ) ) );
+		</cfscript>
+	</cffunction>
+
 <!--- private --->
 	<cffunction name="_teardownTestIndexes" access="private" returntype="void" output="false">
 		<cftry>
