@@ -153,6 +153,69 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="t08_addDocs_shouldAddAndUpdateMultipleDocsAtOnce" returntype="void">
+		<cfscript>
+			var indexName = "addDocsTest";
+			var type      = "someType";
+			var result    = wrapper.createIndex( indexName );
+			var i         = "";
+			var docs      = [{
+				  id = 1
+				, title = "Title 1"
+				, category = "Category 1"
+			},{
+				  id = 2
+				, title = "Title 2"
+				, category = "Category 2"
+			},{
+				  id = 3
+				, title = "Title 3"
+				, category = "Category 3"
+			},{
+				  id = 4
+				, title = "Title 4"
+				, category = "Category 4"
+			},{
+				  id = 5
+				, title = "Title 5"
+				, category = "Category 5"
+			} ];
+
+			wrapper.addDoc(
+				  index = indexName
+				, type = type
+				, id   = docs[1].id
+				, doc  = docs[1]
+			);
+
+			wrapper.addDoc(
+				  index = indexName
+				, type = type
+				, id   = docs[2].id
+				, doc  = docs[2]
+			);
+
+			docs[1].title = "Title 1 edited";
+			docs[2].title = "Title 2 edited";
+
+			result = wrapper.addDocs( indexName, type, docs );
+
+			super.assert( StructKeyExists( result, 'items' ) and IsArray( result.items ), "Return format is not as expected" );
+			super.assertEquals( ArrayLen( docs ), ArrayLen( result.items ), "Result did not confirm that all docs were added" );
+
+			for( i=1; i LTE ArrayLen( result.items ); i++ ){
+				super.assert( result.items[i].index.ok, "The item was not added" );
+				if ( result.items[i].index._id lte 2 ) {
+					super.assertEquals( 2, result.items[i].index._version, "Item should have been updated to version 2 but wasn't." );
+				} else {
+					super.assertEquals( 1, result.items[i].index._version, "Item should have been at version 1 but wasn't." );
+				}
+			}
+
+			debug( result );
+		</cfscript>
+	</cffunction>
+
 <!--- private --->
 	<cffunction name="_teardownTestIndexes" access="private" returntype="void" output="false">
 		<cftry>
