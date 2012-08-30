@@ -43,6 +43,30 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="addDocs" access="public" returntype="any" output="false">
+		<cfargument name="index"   type="string" required="true" />
+		<cfargument name="type"    type="string" required="true" />
+		<cfargument name="docs"    type="array"  required="true" />
+		<cfargument name="idField" type="string" required="false" default="id" />
+
+		<cfscript>
+			var uri  = "/#_safeIndexName( index )#/#Trim( type )#/_bulk";
+			var body = "";
+			var i    = 0;
+
+			for( i=1; i LTE ArrayLen( docs ); i++ ){
+				body = body & '{ "index" : { "_id" : "#docs[i][idField]#" } }' & chr(10);
+				body = body & SerializeJson( docs[i] ) & chr(10);
+			}
+
+			return _call(
+				  uri    = uri
+				, method = "PUT"
+				, body   = body
+			);
+		</cfscript>
+	</cffunction>
+
 <!--- private utility --->
 	<cffunction name="_call" access="private" returntype="any" output="false">
 		<cfargument name="uri" type="string" required="true" />
