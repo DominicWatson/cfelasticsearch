@@ -216,6 +216,32 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="t09_addDocs_shouldThrowErrorWhenDocIsNotStruct" returntype="void">
+		<cfscript>
+			var indexName = "addDocsTestBadDoc";
+			var type      = "someType";
+			var result    = wrapper.createIndex( indexName );
+			var failed    = false;
+			var docs      = [{
+				  id = 1
+				, title = "Title 1"
+				, category = "Category 1"
+			},"bad doc",{
+				  id = 3
+				, title = "Title 3"
+				, category = "Category 3"
+			}];
+
+			try {
+				result = wrapper.addDocs( indexName, type, docs );
+			} catch ( "cfelasticsearch.addDocs.badDoc" e ) {
+				failed = true;
+			}
+
+			assert( failed, "The addDocs method did not throw an appropriate error when a bad document was passed in the array" );
+		</cfscript>
+	</cffunction>
+
 <!--- private --->
 	<cffunction name="_teardownTestIndexes" access="private" returntype="void" output="false">
 		<cftry>

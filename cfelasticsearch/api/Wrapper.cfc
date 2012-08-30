@@ -55,6 +55,13 @@
 			var i    = 0;
 
 			for( i=1; i LTE ArrayLen( docs ); i++ ){
+				if ( not IsStruct( docs[i] ) ) {
+					throw(
+						  type    = "cfelasticsearch.addDocs.badDoc"
+						, message = "The document at index #i# was not of type struct. All docs passed to the addDocs() method must be of type Struct."
+					);
+				}
+
 				body.append( '{ "index" : { "_id" : "#docs[i][idField]#" } }' & chr(10) );
 				body.append( SerializeJson( docs[i] ) & chr(10) );
 			}
