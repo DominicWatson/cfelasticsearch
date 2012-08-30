@@ -51,18 +51,18 @@
 
 		<cfscript>
 			var uri  = "/#_safeIndexName( index )#/#Trim( type )#/_bulk";
-			var body = "";
+			var body = CreateObject( "java", "java.lang.StringBuffer" );
 			var i    = 0;
 
 			for( i=1; i LTE ArrayLen( docs ); i++ ){
-				body = body & '{ "index" : { "_id" : "#docs[i][idField]#" } }' & chr(10);
-				body = body & SerializeJson( docs[i] ) & chr(10);
+				body.append( '{ "index" : { "_id" : "#docs[i][idField]#" } }' & chr(10) );
+				body.append( SerializeJson( docs[i] ) & chr(10) );
 			}
 
 			return _call(
 				  uri    = uri
 				, method = "PUT"
-				, body   = body
+				, body   = body.toString()
 			);
 		</cfscript>
 	</cffunction>
