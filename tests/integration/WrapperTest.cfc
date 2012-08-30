@@ -266,6 +266,23 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="t11_addDocs_shouldThrowError_whenNoDocsPassed" returntype="void">
+		<cfscript>
+			var indexName = "addDocsTestNoDocs";
+			var type      = "someType";
+			var result    = wrapper.createIndex( indexName );
+			var failed    = false;
+
+			try {
+				result = wrapper.addDocs( indexName, type, [] );
+			} catch ( "cfelasticsearch.addDocs.noDocs" e ) {
+				failed = true;
+			}
+
+			assert( failed, "The addDocs method did not throw an appropriate error when no documents were passed" );
+		</cfscript>
+	</cffunction>
+
 <!--- private --->
 	<cffunction name="_teardownTestIndexes" access="private" returntype="void" output="false">
 		<cftry>

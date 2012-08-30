@@ -54,6 +54,14 @@
 			var body = CreateObject( "java", "java.lang.StringBuffer" );
 			var i    = 0;
 
+			if ( not ArrayLen( docs ) ){
+				throw(
+					  type    = "cfelasticsearch.addDocs.noDocs"
+					, message = "No documents to index."
+					, detail  = "An empty array was passed to the addDocs() method."
+				);
+			}
+
 			for( i=1; i LTE ArrayLen( docs ); i++ ){
 				if ( not IsStruct( docs[i] ) ) {
 					throw(
@@ -63,9 +71,9 @@
 				}
 
 				if ( StructKeyExists( docs[i], idField ) ) {
-					body.append( '{ "index" : { "_id" : "#docs[i][idField]#" } }' & chr(10) );
+					body.append( '{"index":{"_id":"#docs[i][idField]#"}}' & chr(10) );
 				} else {
-					body.append( '{ "index" : {} }' & chr(10) );
+					body.append( '{"index":{}}' & chr(10) );
 				}
 				body.append( SerializeJson( docs[i] ) & chr(10) );
 			}
