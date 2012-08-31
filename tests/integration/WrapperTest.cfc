@@ -307,7 +307,19 @@
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="t13_search_shouldReturnAllDocs_whenStarIsSuppliedAsQuery" returntype="void">
+	<cffunction name="t13_refresh_shouldRefreshAnIndex" returntype="void">
+		<cfscript>
+			var indexName = "refreshTest";
+			var type      = "dummyType";
+			var nDocs     = _addABunchOfDocs( indexName, type );
+			var result    = wrapper.refresh( indexName );
+
+			super.assert( IsStruct( result ), "Result not in expected format" );
+			super.assert( result.ok );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t14_search_shouldReturnAllDocs_whenStarIsSuppliedAsQuery" returntype="void">
 		<cfscript>
 			var indexName = "simpleSearchTest";
 			var type      = "dummyType";
@@ -315,7 +327,6 @@
 			var nDocs     = _addABunchOfDocs( indexName, type );
 
 			result = wrapper.search( indexName, "*" );
-
 			super.assert( IsStruct( result ) and StructKeyExists( result, 'hits' ), "Result was not in expected format" );
 			super.assertEquals( nDocs, result.hits.total );
 			super.assertEquals( nDocs, ArrayLen( result.hits.hits ) );
