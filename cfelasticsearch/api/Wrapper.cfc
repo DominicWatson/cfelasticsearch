@@ -29,15 +29,21 @@
 	<cffunction name="addDoc" access="public" returntype="struct" output="false">
 		<cfargument name="index" type="string" required="true" />
 		<cfargument name="type"  type="string" required="true" />
-		<cfargument name="id"    type="string" required="true" />
+		<cfargument name="id"    type="string" required="false" />
 		<cfargument name="doc"   type="struct" required="true" />
 
 		<cfscript>
-			var uri = "/#_safeIndexName( index )#/#Trim( type )#/#id#";
+			var uri    = "/#_safeIndexName( index )#/#Trim( type )#/";
+			var method = "POST";
+
+			if ( StructKeyExists( arguments, 'id' ) and Len( Trim( id ) ) ) {
+				uri    = uri & "#id#";
+				method = "PUT";
+			}
 
 			return _call(
 				  uri    = uri
-				, method = "PUT"
+				, method = method
 				, body   = SerializeJson( doc )
 			);
 		</cfscript>
@@ -116,7 +122,7 @@
 				throw(
 					  type    = "cfelasticsearch.api.Wrapper"
 					, message = "Could not parse result from Elastic Search Server. See detail for response."
-					, detail  = result
+					, detail  = result.filecontent
 				);
 			}
 

@@ -283,6 +283,30 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="t12_addDoc_shouldLetElasticSearchCreateId_whenNoIdSupplied" returntype="void">
+		<cfscript>
+			var indexName = "addDocTest";
+			var result    = "";
+			var doc      = {
+				  title = "This is a title"
+				, category = "Category"
+				, dateCreated = "2012-07-22"
+			};
+
+			result = wrapper.addDoc(
+				  index = indexName
+				, type  = "someType"
+				, doc   = doc
+			);
+
+			super.assert( result.ok );
+			super.assert( Len( Trim( result['_id'] ) ) );
+			super.assertEquals( indexName , result['_index']   );
+			super.assertEquals( 'someType', result['_type']    );
+			super.assertEquals( 1         , result['_version'] );
+		</cfscript>
+	</cffunction>
+
 <!--- private --->
 	<cffunction name="_teardownTestIndexes" access="private" returntype="void" output="false">
 		<cftry>
