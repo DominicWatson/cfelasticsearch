@@ -307,6 +307,21 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="t13_search_shouldReturnAllDocs_whenStarIsSuppliedAsQuery" returntype="void">
+		<cfscript>
+			var indexName = "simpleSearchTest";
+			var type      = "dummyType";
+			var result    = "";
+			var nDocs     = _addABunchOfDocs( indexName, type );
+
+			result = wrapper.search( indexName, "*" );
+
+			super.assert( IsStruct( result ) and StructKeyExists( result, 'hits' ), "Result was not in expected format" );
+			super.assertEquals( nDocs, result.hits.total );
+			super.assertEquals( nDocs, ArrayLen( result.hits.hits ) );
+		</cfscript>
+	</cffunction>
+
 <!--- private --->
 	<cffunction name="_teardownTestIndexes" access="private" returntype="void" output="false">
 		<cftry>
@@ -323,5 +338,38 @@
 				<cfthrow type="cfelasticsearch.testsuite" message="The elastic search engine could not be reached. Please ensure that an instance of elasticsearch is running on localhost at port 9200. Please note, while the test suite makes every effort to clean up after itself, you should not use a working elastic search instance to run these tests against." />
 			</cfcatch>
 		</cftry>
+	</cffunction>
+
+	<cffunction name="_addABunchOfDocs" access="private" returntype="numeric" output="false">
+		<cfargument name="index" type="string" required="true" />
+		<cfargument name="type"  type="string" required="true" />
+
+		<cfscript>
+			var docs      = [{
+				  id = 1
+				, title = "Title 1"
+				, category = "Category 1"
+			},{
+				  id = 2
+				, title = "Title 2"
+				, category = "Category 2"
+			},{
+				  id = 3
+				, title = "Title 3"
+				, category = "Category 3"
+			},{
+				  id = 4
+				, title = "Title 4"
+				, category = "Category 4"
+			},{
+				  id = 5
+				, title = "Title 5"
+				, category = "Category 5"
+			} ];
+
+			wrapper.addDocs( index, type, docs );
+
+			return ArrayLen( docs );
+		</cfscript>
 	</cffunction>
 </cfcomponent>
