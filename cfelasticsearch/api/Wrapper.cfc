@@ -92,6 +92,33 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="search" access="public" returntype="struct" output="false">
+		<cfargument name="index" type="string" required="true" />
+		<cfargument name="q"     type="string" required="true" />
+
+		<cfscript>
+			var uri = "/#_safeIndexName( index )#/_search?q=#q#";
+
+			return _call(
+				  uri    = uri
+				, method = "GET"
+			);
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="refresh" access="public" returntype="struct" output="false">
+		<cfargument name="index" type="string" required="true" />
+
+		<cfscript>
+			var uri = "/#_safeIndexName( index )#/_refresh";
+
+			return _call(
+				  uri = uri
+				, method = "POST"
+			);
+		</cfscript>
+	</cffunction>
+
 <!--- private utility --->
 	<cffunction name="_call" access="private" returntype="any" output="false">
 		<cfargument name="uri" type="string" required="true" />

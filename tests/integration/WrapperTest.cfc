@@ -326,6 +326,7 @@
 			var result    = "";
 			var nDocs     = _addABunchOfDocs( indexName, type );
 
+			wrapper.refresh( indexName );
 			result = wrapper.search( indexName, "*" );
 			super.assert( IsStruct( result ) and StructKeyExists( result, 'hits' ), "Result was not in expected format" );
 			super.assertEquals( nDocs, result.hits.total );
