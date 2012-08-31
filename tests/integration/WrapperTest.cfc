@@ -409,6 +409,21 @@
 
 	</cffunction>
 
+	<cffunction name="t19_search_shouldThrowAnError_whenTypeSuppliedWithoutAnIndex" returntype="void">
+		<cfscript>
+			var failed = false;
+
+			try {
+				wrapper.search( type="test", q="somesearch" );
+			} catch ( "cfelasticsearch.badArguments" e ) {
+				failed = true;
+				super.assertEquals( "You cannot query a type without an index. Type, 'test', supplied but no index supplied.", e.message );
+			}
+
+			super.assert( failed, "Failed to throw an appropriate error message when type supplied without index" );
+		</cfscript>
+	</cffunction>
+
 <!--- private --->
 	<cffunction name="_teardownTestIndexes" access="private" returntype="void" output="false">
 		<cftry>
