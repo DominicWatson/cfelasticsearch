@@ -99,8 +99,8 @@
 	</cffunction>
 
 	<cffunction name="search" access="public" returntype="struct" output="false">
-		<cfargument name="index" type="string" required="true"  />
 		<cfargument name="q"     type="string" required="true"  />
+		<cfargument name="index" type="string" required="false" />
 		<cfargument name="type"  type="string" required="false" />
 
 		<cfscript>

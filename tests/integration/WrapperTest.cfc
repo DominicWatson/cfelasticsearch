@@ -388,6 +388,27 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="t18_search_shouldSearchAcrossAllIndexes_whenNoIndexSupplied" returntype="void">
+		<cfscript>
+			var result = "";
+			var indexName = "someIndex";
+			var nDocs  = _addABunchOfDocs( indexName, "sometype" );
+
+			nDocs = nDocs + _addABunchOfDocs( indexName, "someOtherType" );
+
+			wrapper.refresh( indexName );
+
+			result = wrapper.search( q="*" );
+			super.assert( IsStruct( result ) and StructKeyExists( result, 'hits' ), "Result was not in expected format" );
+
+			debug( result );
+
+			super.assertEquals( nDocs, result.hits.total );
+			super.assertEquals( nDocs, ArrayLen( result.hits.hits ) );
+		</cfscript>
+
+	</cffunction>
+
 <!--- private --->
 	<cffunction name="_teardownTestIndexes" access="private" returntype="void" output="false">
 		<cftry>
