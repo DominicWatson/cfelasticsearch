@@ -107,10 +107,15 @@
 	</cffunction>
 
 	<cffunction name="refresh" access="public" returntype="struct" output="false">
-		<cfargument name="index" type="string" required="true" />
+		<cfargument name="index" type="string" required="false" />
 
 		<cfscript>
-			var uri = "/#_safeIndexName( index )#/_refresh";
+			var uri = "";
+
+			if ( StructKeyExists( arguments, "index" ) ) {
+				uri = "/#_safeIndexName( index )#";
+			}
+			uri = uri & "/_refresh";
 
 			return _call(
 				  uri = uri

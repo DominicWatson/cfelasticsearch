@@ -334,6 +334,37 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="t15_refresh_shouldThrowError_whenIndexDoesNotExist" returntype="void">
+		<cfscript>
+			var indexName = "nonexistantindex";
+			var failed    = false;
+
+			try {
+				result = wrapper.refresh( indexName );
+			} catch ( "cfelasticsearch.IndexMissingException" e ) {
+				failed = true;
+				super.assertEquals( "[#indexName#] missing", e.message );
+				super.assertEquals( 404, e.errorCode );
+			}
+
+			super.assert( failed, "The API did not throw an error when attempting to refresh a non-existant index" );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t16_refresh_shouldRefreshALLIndexes_whenNoIndexSupplied" returntype="void">
+		<cfscript>
+			var result = "";
+			_addABunchOfDocs( "someindex", "sometype" );
+			_addABunchOfDocs( "another"  , "sometype" );
+			_addABunchOfDocs( "blah"     , "sometype" );
+
+			result = wrapper.refresh();
+
+			super.assert( IsStruct( result ), "Result not in expected format" );
+			super.assert( result.ok );
+		</cfscript>
+	</cffunction>
+
 <!--- private --->
 	<cffunction name="_teardownTestIndexes" access="private" returntype="void" output="false">
 		<cftry>
