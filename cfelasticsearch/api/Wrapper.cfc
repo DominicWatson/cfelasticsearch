@@ -93,11 +93,18 @@
 	</cffunction>
 
 	<cffunction name="search" access="public" returntype="struct" output="false">
-		<cfargument name="index" type="string" required="true" />
-		<cfargument name="q"     type="string" required="true" />
+		<cfargument name="index" type="string" required="true"  />
+		<cfargument name="q"     type="string" required="true"  />
+		<cfargument name="type"  type="string" required="false" />
 
 		<cfscript>
-			var uri = "/#_safeIndexName( index )#/_search?q=#q#";
+			var uri = "/#_safeIndexName( index )#";
+
+			if ( StructKeyExists( arguments, "type" ) ) {
+				uri = uri & "/#Trim( type )#";
+			}
+
+			uri = uri & "/_search?q=#q#";
 
 			return _call(
 				  uri    = uri

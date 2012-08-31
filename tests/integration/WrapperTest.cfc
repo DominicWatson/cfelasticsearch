@@ -327,7 +327,7 @@
 			var nDocs     = _addABunchOfDocs( indexName, type );
 
 			wrapper.refresh( indexName );
-			result = wrapper.search( indexName, "*" );
+			result = wrapper.search( index=indexName, q="*" );
 			super.assert( IsStruct( result ) and StructKeyExists( result, 'hits' ), "Result was not in expected format" );
 			super.assertEquals( nDocs, result.hits.total );
 			super.assertEquals( nDocs, ArrayLen( result.hits.hits ) );
@@ -362,6 +362,29 @@
 
 			super.assert( IsStruct( result ), "Result not in expected format" );
 			super.assert( result.ok );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t17_search_shouldSearchAgainstAType_whenSupplied" returntype="void">
+		<cfscript>
+			var result = "";
+			var indexName = "someIndex";
+			var nDocs  = _addABunchOfDocs( indexName, "sometype" );
+
+			_addABunchOfDocs( indexName, "someOtherType" );
+
+			wrapper.refresh( indexName );
+
+			result = wrapper.search( index=indexName, q="*" );
+			super.assert( IsStruct( result ) and StructKeyExists( result, 'hits' ), "Result was not in expected format" );
+			super.assertNotEquals( nDocs, result.hits.total );
+			super.assertNotEquals( nDocs, ArrayLen( result.hits.hits ) );
+
+			result = wrapper.search( index=indexName, type="sometype", q="*" );
+
+			super.assert( IsStruct( result ) and StructKeyExists( result, 'hits' ), "Result was not in expected format" );
+			super.assertEquals( nDocs, result.hits.total );
+			super.assertEquals( nDocs, ArrayLen( result.hits.hits ) );
 		</cfscript>
 	</cffunction>
 
