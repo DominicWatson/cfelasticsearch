@@ -15,15 +15,21 @@
 	</cffunction>
 
 	<cffunction name="createIndex" access="public" returntype="struct" output="false">
-		<cfargument name="indexName" type="string" required="true" />
+		<cfargument name="index" type="string" required="true" />
 
-		<cfreturn _call( uri="/#_safeIndexName( indexName )#", method="PUT" ) />
+		<cfreturn _call(
+			  uri    = _getIndexAndTypeUri( args=arguments, typeAllowed=false )
+			, method = "PUT"
+		) />
 	</cffunction>
 
 	<cffunction name="deleteIndex" access="public" returntype="struct" output="false">
-		<cfargument name="indexName" type="string" required="true" />
+		<cfargument name="index" type="string" required="true" />
 
-		<cfreturn _call( uri="/#_safeIndexName( indexName )#", method="DELETE" ) />
+		<cfreturn _call(
+			  uri    = _getIndexAndTypeUri( args=arguments, typeAllowed=false )
+			, method = "DELETE"
+		) />
 	</cffunction>
 
 	<cffunction name="addDoc" access="public" returntype="struct" output="false">
@@ -33,11 +39,11 @@
 		<cfargument name="doc"   type="struct" required="true" />
 
 		<cfscript>
-			var uri    = "/#_safeIndexName( index )#/#Trim( type )#/";
+			var uri    = _getIndexAndTypeUri( args=arguments );
 			var method = "POST";
 
 			if ( StructKeyExists( arguments, 'id' ) and Len( Trim( id ) ) ) {
-				uri    = uri & "#id#";
+				uri    = uri & "/#id#";
 				method = "PUT";
 			}
 
@@ -56,7 +62,7 @@
 		<cfargument name="idField" type="string" required="false" default="id" />
 
 		<cfscript>
-			var uri  = "/#_safeIndexName( index )#/#Trim( type )#/_bulk";
+			var uri  = _getIndexAndTypeUri( args=arguments ) & "/_bulk";
 			var body = CreateObject( "java", "java.lang.StringBuffer" );
 			var i    = 0;
 
@@ -98,13 +104,7 @@
 		<cfargument name="type"  type="string" required="false" />
 
 		<cfscript>
-			var uri = "/#_safeIndexName( index )#";
-
-			if ( StructKeyExists( arguments, "type" ) ) {
-				uri = uri & "/#Trim( type )#";
-			}
-
-			uri = uri & "/_search?q=#q#";
+			var uri = _getIndexAndTypeUri( args=arguments ) & "/_search?q=#q#";
 
 			return _call(
 				  uri    = uri
@@ -117,12 +117,7 @@
 		<cfargument name="index" type="string" required="false" />
 
 		<cfscript>
-			var uri = "";
-
-			if ( StructKeyExists( arguments, "index" ) ) {
-				uri = "/#_safeIndexName( index )#";
-			}
-			uri = uri & "/_refresh";
+			var uri = _getIndexAndTypeUri( args=arguments, typeAllowed=false ) & "/_refresh";
 
 			return _call(
 				  uri = uri
@@ -204,6 +199,25 @@
 		<cfargument name="indexName" type="string" required="true" />
 
 		<cfreturn Trim( LCase( indexName ) ) />
+	</cffunction>
+
+	<cffunction name="_getIndexAndTypeUri" access="private" returntype="string" output="false">
+		<cfargument name="args"        type="struct"  required="true" />
+		<cfargument name="typeAllowed" type="boolean" required="false" default="true" />
+
+		<cfscript>
+			var uri = "";
+
+			if ( StructKeyExists( args, 'index' ) ) {
+				uri = "/#_safeIndexName( args.index )#";
+			}
+
+			if ( typeAllowed and StructKeyExists( args, 'type' ) ) {
+				uri = uri & "/#Trim( args.type )#";
+			}
+
+			return uri;
+		</cfscript>
 	</cffunction>
 
 <!--- accessors --->
