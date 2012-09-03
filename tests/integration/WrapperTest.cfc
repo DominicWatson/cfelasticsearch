@@ -211,8 +211,6 @@
 					super.assertEquals( 1, result.items[i].index._version, "Item should have been at version 1 but wasn't." );
 				}
 			}
-
-			debug( result );
 		</cfscript>
 	</cffunction>
 
@@ -442,6 +440,75 @@
 
 			super.assert( IsStruct( result ), "Result not in expected format" );
 			super.assertEquals( nDocsExpected, result.hits.total );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t21_search_shouldReturnPaginatedResults" returntype="void">
+		<cfscript>
+			var result        = "";
+			var result2       = "";
+			var nDocsExpected = 0;
+
+			nDocsExpected += _addABunchOfDocs( "index1", "type1" );
+			nDocsExpected += _addABunchOfDocs( "index1", "type2" );
+			nDocsExpected += _addABunchOfDocs( "index1", "type3" );
+			nDocsExpected += _addABunchOfDocs( "index1", "type4" );
+
+
+			wrapper.refresh();
+
+			result  = wrapper.search( q="*", page=3, pageSize=1 );
+			result2 = wrapper.search( q="*", page=4, pageSize=1 );
+
+			super.assert( IsStruct( result ), "Result not in expected format" );
+			super.assertEquals( nDocsExpected, result.hits.total );
+			super.assertEquals( 1, ArrayLen( result.hits.hits ) );
+
+			super.assert( IsStruct( result2 ), "Result not in expected format" );
+			super.assertEquals( nDocsExpected, result2.hits.total );
+			super.assertEquals( 1, ArrayLen( result2.hits.hits ) );
+
+			super.assertNotEquals( result2.hits.hits[1]._source, result.hits.hits[1]._source );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t22_search_shouldThrowError_whenPageNumberIsSubZero" returntype="void">
+		<cfscript>
+			var failed = false;
+
+			_addABunchOfDocs( "index1", "type1" );
+			_addABunchOfDocs( "index1", "type2" );
+			_addABunchOfDocs( "index1", "type3" );
+			_addABunchOfDocs( "index1", "type4" );
+
+			wrapper.refresh();
+
+			try {
+				wrapper.search( q="*", page=-2 );
+			} catch ( "cfelasticsearch.search.invalidPage" e ) {
+				failed = true;
+			} catch ( any e ) {}
+
+			assert( failed, "The search method did not throw an appropriate error when the page number was zero or less" );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t23_search_shouldReturnNoResults_whenPageNumberIsGreaterThanNumberOfPagesForQuery" returntype="void">
+		<cfscript>
+			var result = "";
+
+			_addABunchOfDocs( "index1", "type1" );
+			_addABunchOfDocs( "index1", "type2" );
+			_addABunchOfDocs( "index1", "type3" );
+			_addABunchOfDocs( "index1", "type4" );
+
+			wrapper.refresh();
+
+			result = wrapper.search( q="*", page=1000, pageSize=100 );
+
+			super.assert( IsStruct( result ), "Result not in expected format" );
+			super.assert( result.hits.total );
+			super.assertEquals( 0, ArrayLen( result.hits.hits ) );
 		</cfscript>
 	</cffunction>
 

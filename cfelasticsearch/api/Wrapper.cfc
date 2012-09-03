@@ -99,12 +99,15 @@
 	</cffunction>
 
 	<cffunction name="search" access="public" returntype="struct" output="false">
-		<cfargument name="q"     type="string" required="true"  />
-		<cfargument name="index" type="string" required="false" />
-		<cfargument name="type"  type="string" required="false" />
+		<cfargument name="q"        type="string"  required="true"  />
+		<cfargument name="index"    type="string"  required="false" />
+		<cfargument name="type"     type="string"  required="false" />
+		<cfargument name="page"     type="numeric" required="false" default="1"  />
+		<cfargument name="pageSize" type="numeric" required="false" default="10" />
 
 		<cfscript>
-			var uri = _getIndexAndTypeUri( args=arguments ) & "/_search?q=#q#";
+			var from = _calculateStartRecordFromPageInfo( page, pageSize );
+			var uri = _getIndexAndTypeUri( args=arguments ) & "/_search?q=#q#&from=#from#&size=#pageSize#";
 
 			return _call(
 				  uri    = uri
@@ -220,6 +223,22 @@
 			}
 
 			return uri;
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="_calculateStartRecordFromPageInfo" access="private" returntype="numeric" output="false">
+		<cfargument name="page"     type="numeric" required="true" />
+		<cfargument name="pageSize" type="numeric" required="true" />
+
+		<cfscript>
+			if ( page lte 0 ) {
+				throw(
+					  type    = "cfelasticsearch.search.invalidPage"
+					, message = "Page number must be greater than zero. Page number supplied was '#page#'."
+				);
+			}
+
+			return ((page-1) * pageSize) + 1;
 		</cfscript>
 	</cffunction>
 
