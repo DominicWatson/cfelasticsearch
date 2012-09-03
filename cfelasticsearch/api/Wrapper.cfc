@@ -214,10 +214,7 @@
 
 			if ( typeAllowed and StructKeyExists( args, 'type' ) ) {
 				if ( uri EQ "" ) {
-					throw(
-						  type    = "cfelasticsearch.badArguments"
-						, message = "You cannot query a type without an index. Type, '#args.type#', supplied but no index supplied."
-					);
+					uri = "/_all";
 				}
 				uri = uri & "/#Trim( args.type )#";
 			}

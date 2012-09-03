@@ -401,26 +401,26 @@
 			result = wrapper.search( q="*" );
 			super.assert( IsStruct( result ) and StructKeyExists( result, 'hits' ), "Result was not in expected format" );
 
-			debug( result );
-
 			super.assertEquals( nDocs, result.hits.total );
 			super.assertEquals( nDocs, ArrayLen( result.hits.hits ) );
 		</cfscript>
 
 	</cffunction>
 
-	<cffunction name="t19_search_shouldThrowAnError_whenTypeSuppliedWithoutAnIndex" returntype="void">
+	<cffunction name="t19_search_shouldSearchAcrossAllIndexes_whenTypeSuppliedWithoutAnIndex" returntype="void">
 		<cfscript>
-			var failed = false;
+			var result = "";
+			var nDocs  = _addABunchOfDocs( "someindex", "sometype" );
 
-			try {
-				wrapper.search( type="test", q="somesearch" );
-			} catch ( "cfelasticsearch.badArguments" e ) {
-				failed = true;
-				super.assertEquals( "You cannot query a type without an index. Type, 'test', supplied but no index supplied.", e.message );
-			}
+			nDocs = nDocs + _addABunchOfDocs( "another", "sometype" );
+			_addABunchOfDocs( "blah", "someOthertype" );
 
-			super.assert( failed, "Failed to throw an appropriate error message when type supplied without index" );
+			wrapper.refresh();
+			result = wrapper.search( type="sometype", q="*" );
+
+			super.assert( IsStruct( result ), "Result not in expected format" );
+			super.assertEquals( nDocs, result.hits.total );
+			super.assertEquals( nDocs, ArrayLen( result.hits.hits ) );
 		</cfscript>
 	</cffunction>
 
