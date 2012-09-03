@@ -330,7 +330,6 @@
 			result = wrapper.search( index=indexName, q="*" );
 			super.assert( IsStruct( result ) and StructKeyExists( result, 'hits' ), "Result was not in expected format" );
 			super.assertEquals( nDocs, result.hits.total );
-			super.assertEquals( nDocs, ArrayLen( result.hits.hits ) );
 		</cfscript>
 	</cffunction>
 
@@ -384,7 +383,6 @@
 
 			super.assert( IsStruct( result ) and StructKeyExists( result, 'hits' ), "Result was not in expected format" );
 			super.assertEquals( nDocs, result.hits.total );
-			super.assertEquals( nDocs, ArrayLen( result.hits.hits ) );
 		</cfscript>
 	</cffunction>
 
@@ -402,7 +400,6 @@
 			super.assert( IsStruct( result ) and StructKeyExists( result, 'hits' ), "Result was not in expected format" );
 
 			super.assertEquals( nDocs, result.hits.total );
-			super.assertEquals( nDocs, ArrayLen( result.hits.hits ) );
 		</cfscript>
 
 	</cffunction>
@@ -420,14 +417,38 @@
 
 			super.assert( IsStruct( result ), "Result not in expected format" );
 			super.assertEquals( nDocs, result.hits.total );
-			super.assertEquals( nDocs, ArrayLen( result.hits.hits ) );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="t20_search_shouldSearchAcrossMultipleIndexesAndMultipleTypes" returntype="void">
+		<cfscript>
+			var result        = "";
+			var nDocsExpected = 0;
+
+			nDocsExpected += _addABunchOfDocs( "index1", "type1" );
+			nDocsExpected += _addABunchOfDocs( "index1", "type3" );
+			nDocsExpected += _addABunchOfDocs( "index3", "type1" );
+			nDocsExpected += _addABunchOfDocs( "index3", "type3" );
+
+			_addABunchOfDocs( "index1", "type2" );
+			_addABunchOfDocs( "index2", "type1" );
+			_addABunchOfDocs( "index2", "type2" );
+			_addABunchOfDocs( "index2", "type3" );
+			_addABunchOfDocs( "index3", "type2" );
+
+			wrapper.refresh();
+
+			result = wrapper.search( index="index1,index3", type="type1,type3", q="*" );
+
+			super.assert( IsStruct( result ), "Result not in expected format" );
+			super.assertEquals( nDocsExpected, result.hits.total );
 		</cfscript>
 	</cffunction>
 
 <!--- private --->
 	<cffunction name="_teardownTestIndexes" access="private" returntype="void" output="false">
 		<cftry>
-			<cfset wrapper.deleteIndex( indexName ) />
+			<cfset wrapper.deleteIndex( "_all" ) />
 			<cfcatch>
 			</cfcatch>
 		</cftry>
