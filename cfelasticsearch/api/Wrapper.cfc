@@ -106,12 +106,19 @@
 		<cfargument name="pageSize" type="numeric" required="false" default="10" />
 
 		<cfscript>
-			var from = _calculateStartRecordFromPageInfo( page, pageSize );
-			var uri = _getIndexAndTypeUri( args=arguments ) & "/_search?q=#q#&from=#from#&size=#pageSize#";
+			var uri  = _getIndexAndTypeUri( args=arguments ) & "/_search";
+			var body = StructNew();
+
+			body['from'] = _calculateStartRecordFromPageInfo( page, pageSize );
+			body['size'] = pageSize;
+			body['query'] = StructNew();
+			body['query']['query_string'] = StructNew();
+			body['query']['query_string']['query'] = q;
 
 			return _call(
 				  uri    = uri
-				, method = "GET"
+				, method = "POST"
+				, body   = SerializeJson( body )
 			);
 		</cfscript>
 	</cffunction>
