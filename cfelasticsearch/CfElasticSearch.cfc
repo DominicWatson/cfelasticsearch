@@ -107,18 +107,7 @@
 		<cfargument name="type"  type="string" required="true" />
 
 		<cfscript>
-			if ( not StructKeyExists( _indexes, index ) ) {
-				throw(
-					  type = "cfelasticsearch.index.notfound"
-					, message = "The index, '#index#', could not be found. Please ensure that the index name is correct and that index is defined within your indexFolders as per the CfElasticSearch documentation."
-				);
-			}
-			if ( not StructKeyExists( _indexes[index], type ) ) {
-				throw(
-					  type = "cfelasticsearch.index.type.notfound"
-					, message = "The index type, '#index#.#type#', could not be found. Please ensure that the type name is correct and that type component is defined within your indexFolders as per the CfElasticSearch documentation."
-				);
-			}
+			_checkIndexAndTypeExist( index, type );
 			return _indexes[ index ][ type ];
 		</cfscript>
 	</cffunction>
@@ -189,13 +178,30 @@
 		<cfargument name="index" type="string" required="true" />
 
 		<cfscript>
+			_checkIndexAndTypeExist( index );
+
+			return StructKeyArray( _indexes[ index ] );
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="_checkIndexAndTypeExist" access="private" returntype="void" output="false">
+		<cfargument name="index" type="string" required="true" />
+		<cfargument name="type" type="string" required="false" />
+
+		<cfscript>
 			if ( not StructKeyExists( _indexes, index ) ) {
 				throw(
 					  type = "cfelasticsearch.index.notfound"
 					, message = "The index, '#index#', could not be found. Please ensure that the index name is correct and that index is defined within your indexFolders as per the CfElasticSearch documentation."
 				);
 			}
-			return StructKeyArray( _indexes[ index ] );
+
+			if ( StructKeyExists( arguments, 'type' ) and not StructKeyExists( _indexes[ index ], type ) ) {
+				throw(
+					  type = "cfelasticsearch.index.type.notfound"
+					, message = "The index type, '#index#.#type#', could not be found. Please ensure that the type name is correct and that type component is defined within your indexFolders as per the CfElasticSearch documentation."
+				);
+			}
 		</cfscript>
 	</cffunction>
 
