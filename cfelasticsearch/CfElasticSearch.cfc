@@ -9,11 +9,11 @@
 
 <!--- constructor --->
 	<cffunction name="init" access="public" returntype="any" output="false">
-		<cfargument name="endpoint"     type="string" required="false" default="http://localhost:9200" />
-		<cfargument name="indexFolders" type="string" required="true" />
+		<cfargument name="indexFolders"          type="string" required="true"                                  hint="Comma separated list of *mapped* folder paths. Mapped paths must be used in order for CfElasticSearch to know how to instantiate components that live in these folders." />
+		<cfargument name="elasticSearchEndpoint" type="string" required="false" default="http://localhost:9200" hint="Full enpoint address of the elasticsearch server including protocol and port. The default is 'http://localhost:9200'." />
 
 		<cfscript>
-			_setupApiWrapper( endpoint     );
+			_setupApiWrapper( elasticSearchEndpoint );
 			_setIndexFolders( indexFolders );
 
 			_loadIndexDefinitions();
