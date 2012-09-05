@@ -11,12 +11,14 @@
 		<cfscript>
 			super.setup();
 			cfelasticsearch = CreateObject( "component", "cfelasticsearch.CfElasticSearch" );
+			wrapper         = CreateObject( "component", "cfelasticsearch.api.Wrapper" ).init();
 		</cfscript>
 	</cffunction>
 
 	<cffunction name="teardown" access="public" returntype="void" output="false">
 		<cfscript>
 			super.teardown();
+			_teardownTestIndexes();
 		</cfscript>
 	</cffunction>
 
@@ -170,4 +172,13 @@
 			</cfcatch>
 		</cftry>
 	</cffunction>
+
+	<cffunction name="_teardownTestIndexes" access="private" returntype="void" output="false">
+		<cftry>
+			<cfset wrapper.deleteIndex( "_all" ) />
+			<cfcatch>
+			</cfcatch>
+		</cftry>
+	</cffunction>
+
 </cfcomponent>
