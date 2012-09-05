@@ -103,6 +103,12 @@
 		<cfargument name="type"  type="string" required="true" />
 
 		<cfscript>
+			if ( not StructKeyExists( _indexes, index ) ) {
+				throw(
+					  type = "cfelasticsearch.index.notfound"
+					, message = "The index, '#index#', could not be found. Please ensure that the index name is correct and that index is defined within your indexFolders as per the CfElasticSearch documentation."
+				);
+			}
 			return _indexes[ index ][ type ];
 		</cfscript>
 	</cffunction>
