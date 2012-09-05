@@ -24,8 +24,9 @@
 
 <!--- public methods --->
 	<cffunction name="index" access="public" returntype="numeric" output="false">
-		<cfargument name="index" type="string" required="true" />
+		<cfargument name="index" type="string" required="true"  />
 		<cfargument name="type"  type="string" required="false" />
+		<cfargument name="id"    type="string" required="false" default="" />
 
 		<cfscript>
 			var types            = "";
@@ -39,7 +40,7 @@
 			}
 
 			for( i=1; i lte ArrayLen( types ); i++ ){
-				totalIndexedDocs += _indexType( index, types[i] );
+				totalIndexedDocs += _indexType( index, types[i], id );
 			}
 
 			return totalIndexedDocs;
@@ -93,10 +94,17 @@
 	<cffunction name="_getDocsForIndexing" access="private" returntype="array" output="false">
 		<cfargument name="index" type="string" required="true" />
 		<cfargument name="type"  type="string" required="true" />
+		<cfargument name="id"    type="string" required="true" />
 
 		<cfscript>
 			var typeCfc = _getTypeComponent( index, type );
-			var docs    = typeCfc.get();
+			var docs    = "";
+
+			if ( Len( Trim( id ) ) ) {
+				docs = typeCfc.get( id );
+			} else {
+				docs = typeCfc.get();
+			}
 
 			return _queryToArrayOfStructs( docs );
 		</cfscript>
@@ -158,9 +166,10 @@
 	<cffunction name="_indexType" access="private" returntype="numeric" output="false">
 		<cfargument name="index" type="string" required="true" />
 		<cfargument name="type"  type="string" required="true" />
+		<cfargument name="id"    type="string" required="true" />
 
 		<cfscript>
-			var docs   = _getDocsForIndexing( index, type );
+			var docs   = _getDocsForIndexing( index, type, id );
 			var result = _getApiWrapper().addDocs(
 				  index = index
 				, type  = type

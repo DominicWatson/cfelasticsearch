@@ -142,6 +142,25 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="t08_index_shouldIndexASingleDocument_whenIdSupplied" returntype="void">
+		<cfscript>
+			var nDocsIndexed         = "";
+			var expectedNDocsIndexed = 1;
+
+			cfelasticsearch = cfelasticsearch.init(
+				indexFolders = '/tests/integration/resources/indexes/goodset1'
+			);
+
+			nDocsIndexed = cfelasticsearch.index(
+				  index = "test1"
+				, type  = "default"
+				, id    = 1337
+			);
+
+			super.assertEquals( expectedNDocsIndexed, nDocsIndexed );
+		</cfscript>
+	</cffunction>
+
 <!--- private helpers --->
 	<cffunction name="_checkRunningInstanceOfES" access="private" returntype="void" output="false">
 		<cftry>
