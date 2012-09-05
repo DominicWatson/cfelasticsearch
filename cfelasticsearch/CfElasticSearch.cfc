@@ -109,6 +109,12 @@
 					, message = "The index, '#index#', could not be found. Please ensure that the index name is correct and that index is defined within your indexFolders as per the CfElasticSearch documentation."
 				);
 			}
+			if ( not StructKeyExists( _indexes[index], type ) ) {
+				throw(
+					  type = "cfelasticsearch.index.type.notfound"
+					, message = "The index type, '#index#.#type#', could not be found. Please ensure that the type name is correct and that type component is defined within your indexFolders as per the CfElasticSearch documentation."
+				);
+			}
 			return _indexes[ index ][ type ];
 		</cfscript>
 	</cffunction>

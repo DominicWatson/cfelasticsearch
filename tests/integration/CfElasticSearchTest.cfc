@@ -68,6 +68,26 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="t04_index_shouldThrowError_whenTypeDoesNotExist" returntype="void">
+		<cfscript>
+			var failed = false;
+
+			cfelasticsearch = cfelasticsearch.init(
+				indexFolders = '/tests/integration/resources/indexes/goodset1'
+			);
+
+			try {
+				cfelasticsearch.index( index="test1", type="typeThatDoesNotExist" );
+			} catch ( "cfelasticsearch.index.type.notfound" e ) {
+				failed = true;
+			} catch ( any e ) {}
+
+
+			super.assert( failed, "CfElasticSearch did not throw an appropriate error when an index type was not found." );
+
+		</cfscript>
+	</cffunction>
+
 <!--- private helpers --->
 	<cffunction name="_checkRunningInstanceOfES" access="private" returntype="void" output="false">
 		<cftry>
