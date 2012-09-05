@@ -25,20 +25,24 @@
 <!--- public methods --->
 	<cffunction name="index" access="public" returntype="numeric" output="false">
 		<cfargument name="index" type="string" required="true" />
-		<cfargument name="type"  type="string" required="true" />
+		<cfargument name="type"  type="string" required="false" />
 
 		<cfscript>
-			var docs   = _getDocsForIndexing( index, type );
-			var result = _getApiWrapper().addDocs(
-				  index = index
-				, type  = type
-				, docs  = docs
-			);
-			if ( StructKeyExists( result, 'items' ) and IsArray( result.items ) ) {
-				return ArrayLen( result.items );
+			var types            = "";
+			var totalIndexedDocs = 0;
+			var i                = 0;
+
+			if ( StructKeyExists( arguments, 'type' ) ) {
+				types = ListToArray( type );
+			} else {
+				types = _getIndexTypes( index );
 			}
 
-			return 0;
+			for( i=1; i lte ArrayLen( types ); i++ ){
+				totalIndexedDocs += _indexType( index, types[i] );
+			}
+
+			return totalIndexedDocs;
 		</cfscript>
 	</cffunction>
 
@@ -161,6 +165,34 @@
 			_indexes[ index ][ ListLast( componentPath, '.' ) ] = instance;
 		</cfscript>
 	</cffunction>
+
+	<cffunction name="_indexType" access="private" returntype="numeric" output="false">
+		<cfargument name="index" type="string" required="true" />
+		<cfargument name="type"  type="string" required="true" />
+
+		<cfscript>
+			var docs   = _getDocsForIndexing( index, type );
+			var result = _getApiWrapper().addDocs(
+				  index = index
+				, type  = type
+				, docs  = docs
+			);
+			if ( StructKeyExists( result, 'items' ) and IsArray( result.items ) ) {
+				return ArrayLen( result.items );
+			}
+
+			return 0;
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="_getIndexTypes" access="private" returntype="array" output="false">
+		<cfargument name="index" type="string" required="true" />
+
+		<cfscript>
+			return StructKeyArray( _indexes[ index ] );
+		</cfscript>
+	</cffunction>
+
 
 <!--- accessors --->
 	<cffunction name="_getApiWrapper" access="private" returntype="any" output="false">

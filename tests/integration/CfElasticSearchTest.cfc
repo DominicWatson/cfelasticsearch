@@ -88,6 +88,23 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="t05_index_shouldIndexAllTypes_whenNoTypePassed" returntype="void">
+		<cfscript>
+			var nDocsIndexed         = "";
+			var expectedNDocsIndexed = 21;
+
+			cfelasticsearch = cfelasticsearch.init(
+				indexFolders = '/tests/integration/resources/indexes/goodset1'
+			);
+
+			nDocsIndexed = cfelasticsearch.index(
+				  index = "test1"
+			);
+
+			super.assertEquals( expectedNDocsIndexed, nDocsIndexed );
+		</cfscript>
+	</cffunction>
+
 <!--- private helpers --->
 	<cffunction name="_checkRunningInstanceOfES" access="private" returntype="void" output="false">
 		<cftry>
