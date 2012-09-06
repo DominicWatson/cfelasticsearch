@@ -163,38 +163,31 @@
 		</cfscript>
 	</cffunction>
 
-	<cffunction name="t09_indexTypeCfcs_shouldHaveConstructorArgsPassedToThemFromConfigurationStruct" returntype="void">
+	<cffunction name="t09_indexTypeCfcs_shouldHaveConstructorArgsPassedOnToThemFromApiConstructorArgs" returntype="void">
 		<cfscript>
 			var nDocsIndexed = "";
-			var constructorArgs = {
-				returnXDocs = 4
-			};
 
 			cfelasticsearch = cfelasticsearch.init(
-				  indexFolders    = '/tests/integration/resources/indexes/goodset2'
-				, constructorArgs = constructorArgs
+				  indexFolders = '/tests/integration/resources/indexes/goodset2'
+				, returnXDocs  = 4
 			);
-
 			nDocsIndexed = cfelasticsearch.index(
 				  index = "test1"
 				, type  = "type1"
 			);
-
-			super.assertEquals( constructorArgs.returnXDocs, nDocsIndexed );
+			super.assertEquals( 4, nDocsIndexed );
 
 			// test again with different args to see different result
-			constructorArgs.returnXDocs = 3;
 			cfelasticsearch = cfelasticsearch.init(
-				  indexFolders    = '/tests/integration/resources/indexes/goodset2'
-				, constructorArgs = constructorArgs
+				  indexFolders = '/tests/integration/resources/indexes/goodset2'
+				, returnXDocs  = 21
 			);
-
 			nDocsIndexed = cfelasticsearch.index(
 				  index = "test1"
 				, type  = "type1"
 			);
 
-			super.assertEquals( constructorArgs.returnXDocs, nDocsIndexed );
+			super.assertEquals( 21, nDocsIndexed );
 		</cfscript>
 	</cffunction>
 
