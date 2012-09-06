@@ -2,19 +2,21 @@
 
 <!--- properties --->
 	<cfscript>
-		_apiWrapper   = "";
-		_indexFolders = "";
-		_indexes      = StructNew();
+		_apiWrapper      = "";
+		_indexFolders    = "";
+		_indexes         = StructNew();
+		_constructorArgs = StructNew();
 	</cfscript>
 
 <!--- constructor --->
 	<cffunction name="init" access="public" returntype="any" output="false">
 		<cfargument name="indexFolders"          type="string" required="true"                                  hint="Comma separated list of *mapped* folder paths. Mapped paths must be used in order for CfElasticSearch to know how to instantiate components that live in these folders." />
 		<cfargument name="elasticSearchEndpoint" type="string" required="false" default="http://localhost:9200" hint="Full enpoint address of the elasticsearch server including protocol and port. The default is 'http://localhost:9200'." />
-
+		<cfargument name="constructorArgs"       type="struct" required="false" default="#StructNew()#" />
 		<cfscript>
 			_setupApiWrapper( elasticSearchEndpoint );
 			_setIndexFolders( indexFolders );
+			_setConstructorArgs( constructorArgs );
 
 			_loadIndexDefinitions();
 
@@ -159,6 +161,10 @@
 			var componentPath = $mappedPathToComponentPath( "#indexRoot#/#index#/#type#" )
 			var instance      = CreateObject( "component", componentPath );
 
+			if( IsDefined( 'instance.init' ) ) {
+				instance = instance.init( argumentCollection = _getConstructorArgs() );
+			}
+
 			_indexes[ index ][ ListLast( componentPath, '.' ) ] = instance;
 		</cfscript>
 	</cffunction>
@@ -230,6 +236,14 @@
 	<cffunction name="_setIndexFolders" access="private" returntype="void" output="false">
 		<cfargument name="indexFolders" type="string" required="true" />
 		<cfset _indexFolders = arguments.indexFolders />
+	</cffunction>
+
+	<cffunction name="_getConstructorArgs" access="private" returntype="struct" output="false">
+		<cfreturn _constructorArgs>
+	</cffunction>
+	<cffunction name="_setConstructorArgs" access="private" returntype="void" output="false">
+		<cfargument name="constructorArgs" type="struct" required="true" />
+		<cfset _constructorArgs = arguments.constructorArgs />
 	</cffunction>
 
 </cfcomponent>
