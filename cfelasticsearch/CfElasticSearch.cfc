@@ -160,12 +160,11 @@
 		<cfscript>
 			var componentPath = $mappedPathToComponentPath( "#indexRoot#/#index#/#type#" )
 			var instance      = CreateObject( "component", componentPath );
+			var typeName      = ListLast( componentPath, '.' );
 
-			if( IsDefined( 'instance.init' ) ) {
-				instance = instance.init( argumentCollection = _getConstructorArgs() );
-			}
+			instance = _injectConstructorArgs( typeName, instance );
 
-			_indexes[ index ][ ListLast( componentPath, '.' ) ] = instance;
+			_indexes[ index ][ typeName ] = instance;
 		</cfscript>
 	</cffunction>
 
@@ -220,7 +219,48 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="_injectConstructorArgs" access="private" returntype="any" output="false">
+		<cfargument name="type" type="string" required="true" />
+		<cfargument name="typeCfc" type="any" required="true" />
 
+		<cfscript>
+			var md = GetMetaData( typeCfc );
+			var i  = 0;
+
+			if ( StructKeyExists( md, 'functions' ) and IsArray( md.functions ) ) {
+				for( i=1; i lte ArrayLen( md.functions ); i++ ){
+					if ( md.functions[i].name eq "init" ) {
+						_checkConstructorArgsAreAvailable( type, md.functions[i].parameters );
+						return typeCfc.init( argumentCollection = _getConstructorArgs() );
+					}
+				}
+			}
+
+			return typeCfc;
+		</cfscript>
+	</cffunction>
+
+	<cffunction name="_checkConstructorArgsAreAvailable" access="private" returntype="void" output="false">
+		<cfargument name="type" type="string" required="true" />
+		<cfargument name="parameters" type="array" required="true" />
+
+		<cfscript>
+			var i = 0;
+			var constructorArgs = _getConstructorArgs();
+			var isRequired = "";
+
+			for( i=1; i lte ArrayLen( parameters ); i++ ){
+				isRequired = StructKeyExists( parameters[i], 'required' ) and IsBoolean( parameters[i].required ) and parameters[i].required;
+				if ( isRequired and not StructKeyExists( constructorArgs, parameters[i].name ) ) {
+					throw(
+						  type    = "cfelasticsearch.typecfc.missingargument"
+						, message = "The index type, #type#, expected the argument '#parameters[i].name#' to its constructor but it was not available. See detail for help resolving this issue."
+						, detail  = "TODO: Help resolving issue here."
+					);
+				}
+			}
+		</cfscript>
+	</cffunction>
 <!--- accessors --->
 	<cffunction name="_getApiWrapper" access="private" returntype="any" output="false">
 		<cfreturn _apiWrapper>

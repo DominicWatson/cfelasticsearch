@@ -191,6 +191,23 @@
 		</cfscript>
 	</cffunction>
 
+	<cffunction name="t10_init_shouldThrowHelpfulError_whenIndexTypeCfcsDoNotHaveAllConstructorArgumentsAvailableToThem" returntype="void">
+		<cfscript>
+			var failed = false;
+
+			try {
+				cfelasticsearch = cfelasticsearch.init(
+					  indexFolders = '/tests/integration/resources/indexes/goodset2'
+				);
+			} catch ( "cfelasticsearch.typecfc.missingargument" e ) {
+				failed = true;
+				super.assertEquals( "The index type, type1, expected the argument 'returnXDocs' to its constructor but it was not available. See detail for help resolving this issue.", e.message );
+			} catch ( any e ) {}
+
+			super.assert( failed, "CfElasticSearch failed to throw a helpful error when an index type cfc did not have all constructor arguments available." );
+		</cfscript>
+	</cffunction>
+
 <!--- private helpers --->
 	<cffunction name="_checkRunningInstanceOfES" access="private" returntype="void" output="false">
 		<cftry>
