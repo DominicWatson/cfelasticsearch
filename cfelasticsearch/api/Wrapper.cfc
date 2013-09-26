@@ -32,6 +32,28 @@
 		) />
 	</cffunction>
 
+
+	<cffunction name="deleteDoc" access="public" returntype="struct" output="false">
+		<cfargument name="index" type="string" required="true" />
+		<cfargument name="type" type="string" required="true" />
+		<cfargument name="id" type="string" required="true" />
+
+		<cfscript>
+			var uri    = _getIndexAndTypeUri( args=arguments );
+			var method = "DELETE";
+
+			if ( StructKeyExists( arguments, 'id' ) and Len( Trim( id ) ) ) {
+				uri    = uri & "/#id#";
+			}
+
+			return _call(
+				  uri    = uri
+				, method = "DELETE"
+			);
+		</cfscript>
+
+	</cffunction>
+
 	<cffunction name="addDoc" access="public" returntype="struct" output="false">
 		<cfargument name="index" type="string" required="true" />
 		<cfargument name="type"  type="string" required="true" />
@@ -123,6 +145,7 @@
 		</cfscript>
 	</cffunction>
 
+
 	<cffunction name="refresh" access="public" returntype="struct" output="false">
 		<cfargument name="index" type="string" required="false" />
 
@@ -135,6 +158,22 @@
 			);
 		</cfscript>
 	</cffunction>
+
+
+	<cffunction name="getStats" access="public" returntype="struct" output="false">
+		<cfargument name="index" type="string" required="false" />
+
+		<cfscript>
+			var uri = _getIndexAndTypeUri( args=arguments, typeAllowed=false ) & "/_stats";
+
+			return _call(
+				  uri = uri
+				, method = "GET"
+			);
+		</cfscript>
+	</cffunction>
+
+
 
 <!--- private utility --->
 	<cffunction name="_call" access="private" returntype="any" output="false">
@@ -245,7 +284,8 @@
 				);
 			}
 
-			return ((page-1) * pageSize) + 1;
+			// return ((page-1) * pageSize) + 1;
+			return ((page-1) * pageSize);
 		</cfscript>
 	</cffunction>
 
